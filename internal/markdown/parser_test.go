@@ -9,7 +9,7 @@ import (
 
 const input = `Hello world`
 
-func TestInputRead(t *testing.T) {
+func TestReadInput(t *testing.T) {
 	board, err := markdown.Parse(strings.NewReader(input))
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
