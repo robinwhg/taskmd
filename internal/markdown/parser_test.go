@@ -7,9 +7,9 @@ import (
 	markdown "github.com/robinwhg/taskmd/internal/markdown"
 )
 
-func TestInputRead(t *testing.T) {
-	input := "hello world"
+const input = `Hello world`
 
+func TestInputRead(t *testing.T) {
 	board, err := markdown.Parse(strings.NewReader(input))
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
