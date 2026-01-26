@@ -1,3 +1,4 @@
+// Package markdown handles the parsing of markdown content
 package markdown
 
 import (
