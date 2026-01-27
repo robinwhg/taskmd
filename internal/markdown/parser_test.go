@@ -10,6 +10,8 @@ import (
 const input = `
 ## To Do
 
+- [ ] Task A
+
 ## In Progress
 
 ## In Review
@@ -54,6 +56,18 @@ func TestParseColumns(t *testing.T) {
 		if gotName != wantName {
 			t.Fatalf("got column name %v, expected %v", gotName, wantName)
 		}
+	}
+}
+
+func TestParseTasksUnderColumn(t *testing.T) {
+	board, err := markdown.Parse(strings.NewReader(input))
+	assertNoError(t, err)
+
+	got := board.Columns[0].Tasks
+	want := []string{""}
+
+	if len(got) != len(want) {
+		t.Fatalf("got %v tasks, expected %v", len(got), len(want))
 	}
 }
 

@@ -9,10 +9,16 @@ import (
 
 const (
 	columnPrefix = "## "
+	taskPrefix   = "- [ ] "
 )
 
-type Column struct {
+type Task struct {
 	Name string
+}
+
+type Column struct {
+	Name  string
+	Tasks []Task
 }
 
 type Board struct {
@@ -30,6 +36,13 @@ func Parse(input io.Reader) (*Board, error) {
 		column, found := parseColumn(text)
 		if found {
 			board.Columns = append(board.Columns, column)
+			continue
+		}
+
+		task, found := parseTask(text)
+		if found {
+			currentBoard := &board.Columns[len(board.Columns)-1]
+			currentBoard.Tasks = append(currentBoard.Tasks, task)
 		}
 	}
 
@@ -44,4 +57,14 @@ func parseColumn(text string) (column Column, found bool) {
 	}
 
 	return Column{Name: after}, true
+}
+
+func parseTask(text string) (task Task, found bool) {
+	_, found = strings.CutPrefix(text, taskPrefix)
+
+	if !found {
+		return Task{}, false
+	}
+
+	return Task{}, true
 }
