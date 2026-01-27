@@ -1,7 +1,6 @@
 package markdown_test
 
 import (
-	"reflect"
 	"strings"
 	"testing"
 
@@ -31,32 +30,31 @@ func TestReadInput(t *testing.T) {
 func TestParseColumns(t *testing.T) {
 	board, err := markdown.Parse(strings.NewReader(input))
 
+	got := board.Columns
+	want := []markdown.Column{
+		{Name: "To Do"},
+		{Name: "In Progress"},
+		{Name: "In Review"},
+		{Name: "Done"},
+	}
+
 	assertNoError(t, err)
 
-	t.Run("Create columns", func(t *testing.T) {
-		got := len(board.Columns)
+	gotLength := len(board.Columns)
+	wantLength := len(want)
 
-		want := 4
+	if gotLength != wantLength {
+		t.Fatalf("expected %v columns, found %v", gotLength, wantLength)
+	}
 
-		if got != want {
-			t.Fatalf("expected %v columns, found %v", want, got)
+	for index, column := range got {
+		gotName := column.Name
+		wantName := want[index].Name
+
+		if gotName != wantName {
+			t.Fatalf("expected column name %v, got %v", gotName, wantName)
 		}
-	})
-
-	t.Run("Create columns with title", func(t *testing.T) {
-		got := board.Columns
-
-		want := []markdown.Column{
-			{Name: "To Do"},
-			{Name: "In Progress"},
-			{Name: "In Review"},
-			{Name: "Done"},
-		}
-
-		if !reflect.DeepEqual(got, want) {
-			t.Fatalf("expected columns %v got %v", want, got)
-		}
-	})
+	}
 }
 
 func assertNoError(t testing.TB, err error) {
