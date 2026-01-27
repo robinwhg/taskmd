@@ -17,9 +17,10 @@ const input = `
 ## In Review
 
 ## Done
+
 `
 
-func TestReadInput(t *testing.T) {
+func TestParseReturnsBoard(t *testing.T) {
 	board, err := markdown.Parse(strings.NewReader(input))
 
 	assertNoError(t, err)
@@ -31,30 +32,18 @@ func TestReadInput(t *testing.T) {
 
 func TestParseColumns(t *testing.T) {
 	board, err := markdown.Parse(strings.NewReader(input))
-
-	got := board.Columns
-	want := []markdown.Column{
-		{Name: "To Do"},
-		{Name: "In Progress"},
-		{Name: "In Review"},
-		{Name: "Done"},
-	}
-
 	assertNoError(t, err)
 
-	gotLength := len(board.Columns)
-	wantLength := len(want)
+	got := board.Columns
+	want := []string{"To Do", "In Progress", "In Review", "Done"}
 
-	if gotLength != wantLength {
-		t.Fatalf("got %v columns, expected %v", gotLength, wantLength)
+	if len(got) != len(want) {
+		t.Fatalf("got %v columns, expected %v", len(got), len(want))
 	}
 
-	for index, column := range got {
-		gotName := column.Name
-		wantName := want[index].Name
-
-		if gotName != wantName {
-			t.Fatalf("got column name %v, expected %v", gotName, wantName)
+	for i, column := range got {
+		if column.Name != want[i] {
+			t.Fatalf("got column name %q, expected %q", column.Name, want[i])
 		}
 	}
 }
