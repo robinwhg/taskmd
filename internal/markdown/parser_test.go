@@ -58,6 +58,9 @@ func TestParseTasksUnderColumn(t *testing.T) {
 	if len(got) != len(want) {
 		t.Fatalf("got %v tasks, expected %v", len(got), len(want))
 	}
+
+	// TODO: parse checked tasks
+	// TODO: parse task names
 }
 
 func assertNoError(t testing.TB, err error) {
