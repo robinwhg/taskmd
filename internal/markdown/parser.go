@@ -20,25 +20,28 @@ type Board struct {
 }
 
 func Parse(input io.Reader) (*Board, error) {
-	board := Board{Columns: ParseColumns(input)}
+	board := Board{}
 
-	return &board, nil
-}
-
-func ParseColumns(input io.Reader) []Column {
 	scanner := bufio.NewScanner(input)
-
-	columns := []Column{}
 
 	for scanner.Scan() {
 		text := scanner.Text()
 
-		after, found := strings.CutPrefix(text, columnPrefix)
-
+		column, found := parseColumn(text)
 		if found {
-			columns = append(columns, Column{Name: after})
+			board.Columns = append(board.Columns, column)
 		}
 	}
 
-	return columns
+	return &board, nil
+}
+
+func parseColumn(text string) (column Column, found bool) {
+	after, found := strings.CutPrefix(text, columnPrefix)
+
+	if !found {
+		return Column{}, false
+	}
+
+	return Column{Name: after}, true
 }
