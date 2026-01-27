@@ -44,7 +44,7 @@ func TestParseColumns(t *testing.T) {
 	wantLength := len(want)
 
 	if gotLength != wantLength {
-		t.Fatalf("expected %v columns, found %v", gotLength, wantLength)
+		t.Fatalf("got %v columns, expected %v", gotLength, wantLength)
 	}
 
 	for index, column := range got {
@@ -52,7 +52,7 @@ func TestParseColumns(t *testing.T) {
 		wantName := want[index].Name
 
 		if gotName != wantName {
-			t.Fatalf("expected column name %v, got %v", gotName, wantName)
+			t.Fatalf("got column name %v, expected %v", gotName, wantName)
 		}
 	}
 }
