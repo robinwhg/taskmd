@@ -11,6 +11,7 @@ const input = `
 ## To Do
 
 - [ ] Task A
+- [x] Task B
 
 ## In Progress
 
@@ -53,13 +54,12 @@ func TestParseTasksUnderColumn(t *testing.T) {
 	assertNoError(t, err)
 
 	got := board.Columns[0].Tasks
-	want := []string{""}
+	want := []string{"", ""}
 
 	if len(got) != len(want) {
 		t.Fatalf("got %v tasks, expected %v", len(got), len(want))
 	}
 
-	// TODO: parse checked tasks
 	// TODO: parse task names
 }
 

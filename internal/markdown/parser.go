@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	columnPrefix = "## "
-	taskPrefix   = "- [ ] "
+	columnPrefix      = "## "
+	taskPrefix        = "- [ ] "
+	checkedTaskPrefix = "- [x] "
 )
 
 type Task struct {
@@ -52,19 +53,23 @@ func Parse(input io.Reader) (*Board, error) {
 func parseColumn(text string) (column Column, found bool) {
 	after, found := strings.CutPrefix(text, columnPrefix)
 
-	if !found {
-		return Column{}, false
+	if found {
+		return Column{Name: after}, true
 	}
 
-	return Column{Name: after}, true
+	return Column{}, false
 }
 
 func parseTask(text string) (task Task, found bool) {
 	_, found = strings.CutPrefix(text, taskPrefix)
-
-	if !found {
-		return Task{}, false
+	if found {
+		return Task{}, true
 	}
 
-	return Task{}, true
+	_, found = strings.CutPrefix(text, checkedTaskPrefix)
+	if found {
+		return Task{}, true
+	}
+
+	return Task{}, false
 }
