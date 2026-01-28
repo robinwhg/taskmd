@@ -48,6 +48,10 @@ func Parse(input io.Reader) (*Board, error) {
 		}
 	}
 
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
 	return &board, nil
 }
 
