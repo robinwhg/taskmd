@@ -43,7 +43,7 @@ func Parse(input io.Reader) (*Board, error) {
 
 		task, found := parseTask(text)
 		if found {
-			currentBoard := &board.Columns[len(board.Columns)-1]
+			currentBoard := &board.Columns[len(board.Columns)-1] // FIXME: a column has to exist
 			currentBoard.Tasks = append(currentBoard.Tasks, task)
 		}
 	}
