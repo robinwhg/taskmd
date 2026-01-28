@@ -37,15 +37,13 @@ func Parse(input io.Reader) (*Board, error) {
 	for scanner.Scan() {
 		text := scanner.Text()
 
-		task, found := parseTask(text)
-		if found {
+		if task, found := parseTask(text); found {
 			currentBoard := &board.Columns[len(board.Columns)-1] // FIXME: a column has to exist
 			currentBoard.Tasks = append(currentBoard.Tasks, task)
 			continue
 		}
 
-		column, found := parseColumn(text)
-		if found {
+		if column, found := parseColumn(text); found {
 			board.Columns = append(board.Columns, column)
 			continue
 		}
@@ -66,19 +64,15 @@ func Parse(input io.Reader) (*Board, error) {
 }
 
 func parseTitle(text string) (title string, found bool) {
-	after, found := strings.CutPrefix(text, titlePrefix)
-
-	if found {
+	if after, found := strings.CutPrefix(text, titlePrefix); found {
 		return after, true
 	}
 
-	return after, false
+	return "", false
 }
 
 func parseColumn(text string) (column Column, found bool) {
-	after, found := strings.CutPrefix(text, columnPrefix)
-
-	if found {
+	if after, found := strings.CutPrefix(text, columnPrefix); found {
 		return Column{Name: after}, true
 	}
 
@@ -86,13 +80,11 @@ func parseColumn(text string) (column Column, found bool) {
 }
 
 func parseTask(text string) (task Task, found bool) {
-	after, found := strings.CutPrefix(text, taskPrefix)
-	if found {
+	if after, found := strings.CutPrefix(text, taskPrefix); found {
 		return Task{Name: after, Checked: false}, true
 	}
 
-	after, found = strings.CutPrefix(text, checkedTaskPrefix)
-	if found {
+	if after, found := strings.CutPrefix(text, checkedTaskPrefix); found {
 		return Task{Name: after, Checked: true}, true
 	}
 
