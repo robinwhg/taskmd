@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	titlePrefix       = "# "
 	columnPrefix      = "## "
 	taskPrefix        = "- [ ] "
 	checkedTaskPrefix = "- [x] "
@@ -24,6 +25,7 @@ type Column struct {
 }
 
 type Board struct {
+	Title   string
 	Columns []Column
 }
 
@@ -35,16 +37,24 @@ func Parse(input io.Reader) (*Board, error) {
 	for scanner.Scan() {
 		text := scanner.Text()
 
+		task, found := parseTask(text)
+		if found {
+			currentBoard := &board.Columns[len(board.Columns)-1] // FIXME: a column has to exist
+			currentBoard.Tasks = append(currentBoard.Tasks, task)
+			continue
+		}
+
 		column, found := parseColumn(text)
 		if found {
 			board.Columns = append(board.Columns, column)
 			continue
 		}
 
-		task, found := parseTask(text)
-		if found {
-			currentBoard := &board.Columns[len(board.Columns)-1] // FIXME: a column has to exist
-			currentBoard.Tasks = append(currentBoard.Tasks, task)
+		if board.Title == "" {
+			if title, found := parseTitle(text); found {
+				board.Title = title
+				continue
+			}
 		}
 	}
 
@@ -53,6 +63,16 @@ func Parse(input io.Reader) (*Board, error) {
 	}
 
 	return &board, nil
+}
+
+func parseTitle(text string) (title string, found bool) {
+	after, found := strings.CutPrefix(text, titlePrefix)
+
+	if found {
+		return after, true
+	}
+
+	return after, false
 }
 
 func parseColumn(text string) (column Column, found bool) {

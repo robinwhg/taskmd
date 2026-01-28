@@ -8,6 +8,8 @@ import (
 )
 
 const input = `
+# My Task Board
+
 ## To Do
 
 - [ ] Task A
@@ -28,6 +30,18 @@ func TestParseReturnsBoard(t *testing.T) {
 
 	if board == nil {
 		t.Fatal("Expected non-nil value for Board")
+	}
+}
+
+func TestParseTitle(t *testing.T) {
+	board, err := markdown.Parse(strings.NewReader(input))
+	assertNoError(t, err)
+
+	got := board.Title
+	want := "My Task Board"
+
+	if got != want {
+		t.Errorf("got title %q, expected %q", got, want)
 	}
 }
 
