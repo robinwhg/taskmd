@@ -54,13 +54,21 @@ func TestParseTasksUnderColumn(t *testing.T) {
 	assertNoError(t, err)
 
 	got := board.Columns[0].Tasks
-	want := []string{"", ""}
+	want := []markdown.Task{{Name: "Task A", Checked: false}, {Name: "Task B", Checked: true}}
 
 	if len(got) != len(want) {
 		t.Fatalf("got %v tasks, expected %v", len(got), len(want))
 	}
 
-	// TODO: parse task names
+	for i, task := range got {
+		if task.Checked != want[i].Checked {
+			t.Fatalf("got Checked %v, expected %v", task.Checked, want[i].Checked)
+		}
+
+		if task.Name != want[i].Name {
+			t.Fatalf("got Name %q, expected %q", task.Name, want[i].Name)
+		}
+	}
 }
 
 func assertNoError(t testing.TB, err error) {

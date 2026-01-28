@@ -14,7 +14,8 @@ const (
 )
 
 type Task struct {
-	Name string
+	Name    string
+	Checked bool
 }
 
 type Column struct {
@@ -61,14 +62,14 @@ func parseColumn(text string) (column Column, found bool) {
 }
 
 func parseTask(text string) (task Task, found bool) {
-	_, found = strings.CutPrefix(text, taskPrefix)
+	after, found := strings.CutPrefix(text, taskPrefix)
 	if found {
-		return Task{}, true
+		return Task{Name: after, Checked: false}, true
 	}
 
-	_, found = strings.CutPrefix(text, checkedTaskPrefix)
+	after, found = strings.CutPrefix(text, checkedTaskPrefix)
 	if found {
-		return Task{}, true
+		return Task{Name: after, Checked: true}, true
 	}
 
 	return Task{}, false
