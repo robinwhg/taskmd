@@ -85,6 +85,22 @@ func TestParseTasksUnderColumn(t *testing.T) {
 	}
 }
 
+func TestParseTasksUnderNoColumn(t *testing.T) {
+	input := `
+- [ ] Orphan Task
+
+## To Do
+
+- [ ] Task A
+`
+	board, err := markdown.Parse(strings.NewReader(input))
+	assertNoError(t, err)
+
+	if board.Columns[0].Name != "Uncategorized" {
+		t.Fatalf("got column with name %q, but expected Uncategorized", board.Columns[0].Name)
+	}
+}
+
 func assertNoError(t testing.TB, err error) {
 	t.Helper()
 	if err != nil {

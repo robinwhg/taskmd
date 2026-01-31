@@ -38,8 +38,13 @@ func Parse(input io.Reader) (*Board, error) {
 		text := scanner.Text()
 
 		if task, found := parseTask(text); found {
-			currentBoard := &board.Columns[len(board.Columns)-1] // FIXME: Panics if no column exists. List under "Uncategorized" column if none exists.
-			currentBoard.Tasks = append(currentBoard.Tasks, task)
+			if len(board.Columns) > 0 {
+				currentBoard := &board.Columns[len(board.Columns)-1]
+				currentBoard.Tasks = append(currentBoard.Tasks, task)
+				continue
+			}
+
+			board.Columns = append(board.Columns, Column{Name: "Uncategorized", Tasks: []Task{task}})
 			continue
 		}
 
