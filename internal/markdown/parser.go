@@ -65,7 +65,7 @@ func Parse(input io.Reader) (*Board, error) {
 
 func parseTitle(text string) (title string, found bool) {
 	if after, found := strings.CutPrefix(text, titlePrefix); found {
-		return after, true
+		return strings.TrimSpace(after), true
 	}
 
 	return "", false
@@ -73,7 +73,7 @@ func parseTitle(text string) (title string, found bool) {
 
 func parseColumn(text string) (column Column, found bool) {
 	if after, found := strings.CutPrefix(text, columnPrefix); found {
-		return Column{Name: after}, true
+		return Column{Name: strings.TrimSpace(after)}, true
 	}
 
 	return Column{}, false
@@ -81,11 +81,11 @@ func parseColumn(text string) (column Column, found bool) {
 
 func parseTask(text string) (task Task, found bool) {
 	if after, found := strings.CutPrefix(text, taskPrefix); found {
-		return Task{Name: after, Checked: false}, true
+		return Task{Name: strings.TrimSpace(after), Checked: false}, true
 	}
 
 	if after, found := strings.CutPrefix(text, checkedTaskPrefix); found {
-		return Task{Name: after, Checked: true}, true
+		return Task{Name: strings.TrimSpace(after), Checked: true}, true
 	}
 
 	return Task{}, false
