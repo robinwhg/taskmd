@@ -53,7 +53,7 @@ func Parse(input io.Reader) (*Board, error) {
 			continue
 		}
 
-		if board.Title == "" { // FIXME: Should only be set if it appears before the first column
+		if board.Title == "" && len(board.Columns) == 0 {
 			if title, found := parseTitle(text); found {
 				board.Title = title
 				continue
