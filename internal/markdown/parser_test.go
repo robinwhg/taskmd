@@ -7,8 +7,7 @@ import (
 	markdown "github.com/robinwhg/taskmd/internal/markdown"
 )
 
-const input = `
-# My Task Board
+const input = `# My Task Board
 
 ## To Do
 
@@ -16,8 +15,6 @@ const input = `
 - [x] Task B
 
 ## In Progress
-
-## In Review
 
 ## Done
 
@@ -50,15 +47,18 @@ func TestParseColumns(t *testing.T) {
 	assertNoError(t, err)
 
 	got := board.Columns
-	want := []string{"To Do", "In Progress", "In Review", "Done"}
+	want := []markdown.Column{{Name: "To Do", Line: 2}, {Name: "In Progress", Line: 7}, {Name: "Done", Line: 9}}
 
 	if len(got) != len(want) {
 		t.Fatalf("got %v columns, expected %v", len(got), len(want))
 	}
 
 	for i, column := range got {
-		if column.Name != want[i] {
-			t.Fatalf("got column name %q, expected %q", column.Name, want[i])
+		if column.Name != want[i].Name {
+			t.Fatalf("got column name %q, expected %q", column.Name, want[i].Name)
+		}
+		if column.Line != want[i].Line {
+			t.Fatalf("got column on line %v, expected %v", column.Line, want[i].Line)
 		}
 	}
 }

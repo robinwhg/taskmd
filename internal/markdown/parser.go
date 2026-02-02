@@ -22,6 +22,7 @@ type Task struct {
 type Column struct {
 	Name  string
 	Tasks []Task
+	Line  int
 }
 
 type Board struct {
@@ -34,7 +35,9 @@ func Parse(input io.Reader) (*Board, error) {
 
 	scanner := bufio.NewScanner(input)
 
+	lineNum := -1
 	for scanner.Scan() {
+		lineNum++
 		text := scanner.Text()
 
 		if task, found := parseTask(text); found {
@@ -48,7 +51,7 @@ func Parse(input io.Reader) (*Board, error) {
 			continue
 		}
 
-		if column, found := parseColumn(text); found {
+		if column, found := parseColumn(text, lineNum); found {
 			board.Columns = append(board.Columns, column)
 			continue
 		}
@@ -76,9 +79,9 @@ func parseTitle(text string) (title string, found bool) {
 	return "", false
 }
 
-func parseColumn(text string) (column Column, found bool) {
+func parseColumn(text string, lineNum int) (column Column, found bool) {
 	if after, found := strings.CutPrefix(text, columnPrefix); found {
-		return Column{Name: strings.TrimSpace(after)}, true
+		return Column{Name: strings.TrimSpace(after), Line: lineNum}, true
 	}
 
 	return Column{}, false
