@@ -17,6 +17,7 @@ const (
 type Task struct {
 	Name    string
 	Checked bool
+	Line    int
 }
 
 type Column struct {
@@ -40,7 +41,7 @@ func Parse(input io.Reader) (*Board, error) {
 		lineNum++
 		text := scanner.Text()
 
-		if task, found := parseTask(text); found {
+		if task, found := parseTask(text, lineNum); found {
 			if len(board.Columns) > 0 {
 				currentBoard := &board.Columns[len(board.Columns)-1]
 				currentBoard.Tasks = append(currentBoard.Tasks, task)
@@ -87,13 +88,13 @@ func parseColumn(text string, lineNum int) (column Column, found bool) {
 	return Column{}, false
 }
 
-func parseTask(text string) (task Task, found bool) {
+func parseTask(text string, lineNum int) (task Task, found bool) {
 	if after, found := strings.CutPrefix(text, taskPrefix); found {
-		return Task{Name: strings.TrimSpace(after), Checked: false}, true
+		return Task{Name: strings.TrimSpace(after), Checked: false, Line: lineNum}, true
 	}
 
 	if after, found := strings.CutPrefix(text, checkedTaskPrefix); found {
-		return Task{Name: strings.TrimSpace(after), Checked: true}, true
+		return Task{Name: strings.TrimSpace(after), Checked: true, Line: lineNum}, true
 	}
 
 	return Task{}, false
