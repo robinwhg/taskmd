@@ -2,6 +2,7 @@
 package board
 
 import (
+	"errors"
 	"slices"
 
 	"github.com/robinwhg/taskmd/internal/markdown"
