@@ -7,30 +7,6 @@ import (
 	"strings"
 )
 
-const (
-	titlePrefix       = "# "
-	columnPrefix      = "## "
-	taskPrefix        = "- [ ] "
-	checkedTaskPrefix = "- [x] "
-)
-
-type Task struct {
-	Name    string
-	Checked bool
-	Line    int
-}
-
-type Column struct {
-	Name  string
-	Tasks []Task
-	Line  int
-}
-
-type Board struct {
-	Title   string
-	Columns []Column
-}
-
 func Parse(input io.Reader) (*Board, error) {
 	board := Board{}
 
