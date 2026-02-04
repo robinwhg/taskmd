@@ -16,3 +16,13 @@ func TestToggleTask(t *testing.T) {
 		t.Errorf("got %v, expected %v", got.Checked, want)
 	}
 }
+
+func TestRenameTask(t *testing.T) {
+	got := markdown.Task{Name: "Task A"}
+	want := "Task B"
+	board.RenameTask(&got, want)
+
+	if got.Name != want {
+		t.Errorf("got %v, expected %v", got.Name, want)
+	}
+}
