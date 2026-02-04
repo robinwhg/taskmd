@@ -20,17 +20,29 @@ func TestToggleTask(t *testing.T) {
 	}
 }
 
-// TODO: What if new name is empty string?
 func TestRenameTask(t *testing.T) {
-	got := markdown.Task{Name: "Task A"}
-	want := "Task B"
-	err := board.RenameTask(&got, want)
+	t.Run("Rename a task", func(t *testing.T) {
+		got := markdown.Task{Name: "Task A"}
+		want := "Task B"
+		err := board.RenameTask(&got, want)
 
-	assertNoError(t, err)
+		assertNoError(t, err)
 
-	if got.Name != want {
-		t.Errorf("got %v, expected %v", got.Name, want)
-	}
+		if got.Name != want {
+			t.Errorf("got %v, expected %v", got.Name, want)
+		}
+	})
+
+	t.Run("Rename a task to an empty string", func(t *testing.T) {
+		input := markdown.Task{Name: "Task A"}
+		got := board.RenameTask(&input, "")
+
+		assertError(t, got, board.ErrEmptyTaskName)
+
+		if input.Name != "Task A" {
+			t.Errorf("got %q, but expected no name change", input.Name)
+		}
+	})
 }
 
 /* TODO: Test
@@ -62,5 +74,13 @@ func assertNoError(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func assertError(t testing.TB, got, want error) {
+	t.Helper()
+
+	if got != want {
+		t.Errorf("got error %q want %q", got, want)
 	}
 }

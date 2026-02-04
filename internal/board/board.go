@@ -2,15 +2,25 @@
 package board
 
 import (
-	"errors"
 	"slices"
 
 	"github.com/robinwhg/taskmd/internal/markdown"
 )
 
+const (
+	ErrNilTask       = BoardErr("task cannot be nil")
+	ErrEmptyTaskName = BoardErr("task name cannot be empty")
+)
+
+type BoardErr string
+
+func (e BoardErr) Error() string {
+	return string(e)
+}
+
 func ToggleTask(task *markdown.Task) error {
 	if task == nil {
-		return errors.New("task is nil")
+		return ErrNilTask
 	}
 
 	task.Checked = !task.Checked
@@ -20,7 +30,10 @@ func ToggleTask(task *markdown.Task) error {
 
 func RenameTask(task *markdown.Task, name string) error {
 	if task == nil {
-		return errors.New("task is nil")
+		return ErrNilTask
+	}
+	if name == "" {
+		return ErrEmptyTaskName
 	}
 
 	task.Name = name
