@@ -21,3 +21,7 @@ func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) {
 	column.Tasks = slices.Delete(column.Tasks, fromIndex, fromIndex+1)
 	column.Tasks = slices.Insert(column.Tasks, toIndex, task)
 }
+
+func RenameTask(task *markdown.Task, name string) {
+	task.Name = name
+}
