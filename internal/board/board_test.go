@@ -21,11 +21,12 @@ func TestToggleTask(t *testing.T) {
 }
 
 // TODO: What if new name is empty string?
-// TODO: nil check
 func TestRenameTask(t *testing.T) {
 	got := markdown.Task{Name: "Task A"}
 	want := "Task B"
-	board.RenameTask(&got, want)
+	err := board.RenameTask(&got, want)
+
+	assertNoError(t, err)
 
 	if got.Name != want {
 		t.Errorf("got %v, expected %v", got.Name, want)

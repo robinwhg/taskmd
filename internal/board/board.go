@@ -18,8 +18,14 @@ func ToggleTask(task *markdown.Task) error {
 	return nil
 }
 
-func RenameTask(task *markdown.Task, name string) {
+func RenameTask(task *markdown.Task, name string) error {
+	if task == nil {
+		return errors.New("task is nil")
+	}
+
 	task.Name = name
+
+	return nil
 }
 
 func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) {
