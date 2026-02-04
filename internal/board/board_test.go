@@ -10,14 +10,18 @@ import (
 
 func TestToggleTask(t *testing.T) {
 	got := markdown.Task{Checked: false}
-	board.ToggleTask(&got)
+	err := board.ToggleTask(&got)
 	want := true
+
+	assertNoError(t, err)
 
 	if got.Checked != want {
 		t.Errorf("got %v, expected %v", got.Checked, want)
 	}
 }
 
+// TODO: What if new name is empty string?
+// TODO: nil check
 func TestRenameTask(t *testing.T) {
 	got := markdown.Task{Name: "Task A"}
 	want := "Task B"
@@ -27,6 +31,13 @@ func TestRenameTask(t *testing.T) {
 		t.Errorf("got %v, expected %v", got.Name, want)
 	}
 }
+
+/* TODO: Test
+fromIndex == sameIndex
+index out of bounds
+empty slice
+single task in slice
+*/
 
 func TestMoveTaskInColumn(t *testing.T) {
 	got := markdown.Column{Tasks: []markdown.Task{
@@ -43,5 +54,12 @@ func TestMoveTaskInColumn(t *testing.T) {
 
 	if !reflect.DeepEqual(got.Tasks, want.Tasks) {
 		t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
+	}
+}
+
+func assertNoError(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
 	}
 }
