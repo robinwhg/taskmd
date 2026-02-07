@@ -46,28 +46,47 @@ func TestRenameTask(t *testing.T) {
 }
 
 /* TODO: Test
-fromIndex == sameIndex
 index out of bounds
 empty slice
 single task in slice
 */
 
 func TestMoveTaskInColumn(t *testing.T) {
-	got := markdown.Column{Tasks: []markdown.Task{
-		{Name: "Task A"},
-		{Name: "Task B"},
-	}}
+	t.Run("Move task in column", func(t *testing.T) {
+		got := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+			{Name: "Task B"},
+		}}
 
-	want := markdown.Column{Tasks: []markdown.Task{
-		{Name: "Task B"},
-		{Name: "Task A"},
-	}}
+		want := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task B"},
+			{Name: "Task A"},
+		}}
 
-	board.MoveTaskInColumn(&got, 0, 1)
+		board.MoveTaskInColumn(&got, 0, 1)
 
-	if !reflect.DeepEqual(got.Tasks, want.Tasks) {
-		t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
-	}
+		if !reflect.DeepEqual(got.Tasks, got.Tasks) {
+			t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
+		}
+	})
+
+	t.Run("Move task to its current index", func(t *testing.T) {
+		got := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+			{Name: "Task B"},
+		}}
+
+		want := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+			{Name: "Task B"},
+		}}
+
+		board.MoveTaskInColumn(&got, 0, 0)
+
+		if !reflect.DeepEqual(got.Tasks, want.Tasks) {
+			t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
+		}
+	})
 }
 
 func assertNoError(t *testing.T, err error) {

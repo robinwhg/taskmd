@@ -42,6 +42,10 @@ func RenameTask(task *markdown.Task, name string) error {
 }
 
 func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) {
+	if fromIndex == toIndex {
+		return
+	}
+
 	task := column.Tasks[fromIndex]
 	column.Tasks = slices.Delete(column.Tasks, fromIndex, fromIndex+1)
 	column.Tasks = slices.Insert(column.Tasks, toIndex, task)
