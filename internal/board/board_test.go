@@ -10,10 +10,10 @@ import (
 
 func TestToggleTask(t *testing.T) {
 	got := markdown.Task{Checked: false}
-	err := board.ToggleTask(&got)
 	want := true
+	err := board.ToggleTask(&got)
 
-	assertNoError(t, err)
+	assertError(t, err, nil)
 
 	if got.Checked != want {
 		t.Errorf("got %v, expected %v", got.Checked, want)
@@ -26,7 +26,7 @@ func TestRenameTask(t *testing.T) {
 		want := "Task B"
 		err := board.RenameTask(&got, want)
 
-		assertNoError(t, err)
+		assertError(t, err, nil)
 
 		if got.Name != want {
 			t.Errorf("got %v, expected %v", got.Name, want)
@@ -34,26 +34,21 @@ func TestRenameTask(t *testing.T) {
 	})
 
 	t.Run("Rename a task to an empty string", func(t *testing.T) {
-		input := markdown.Task{Name: "Task A"}
-		got := board.RenameTask(&input, "")
+		want := markdown.Task{Name: "Task A"}
+		err := board.RenameTask(&want, "")
 
-		assertError(t, got, board.ErrEmptyTaskName)
+		assertError(t, err, board.ErrEmptyTaskName)
 
-		if input.Name != "Task A" {
-			t.Errorf("got %q, but expected no name change", input.Name)
+		if want.Name != "Task A" {
+			t.Errorf("got %q, but expected no name change", want.Name)
 		}
 	})
 }
 
-/* TODO: Test
-empty slice
-single task in slice
-*/
-
 func TestMoveTaskInColumn(t *testing.T) {
 	tests := []struct {
 		name      string
-		column    markdown.Column
+		got       markdown.Column
 		fromIndex int
 		toIndex   int
 		want      markdown.Column
@@ -89,7 +84,7 @@ func TestMoveTaskInColumn(t *testing.T) {
 			-1,
 			0,
 			makeCol("Task A"),
-			board.ErrNilTask,
+			board.ErrIndexOutOfBounds,
 		},
 		{
 			"toIndex out of lower bounds",
@@ -97,7 +92,7 @@ func TestMoveTaskInColumn(t *testing.T) {
 			0,
 			-1,
 			makeCol("Task A"),
-			board.ErrNilTask,
+			board.ErrIndexOutOfBounds,
 		},
 		{
 			"fromIndex out of upper bounds",
@@ -105,7 +100,7 @@ func TestMoveTaskInColumn(t *testing.T) {
 			2,
 			0,
 			makeCol("Task A"),
-			board.ErrNilTask,
+			board.ErrIndexOutOfBounds,
 		},
 		{
 			"toIndex out of upper bounds",
@@ -113,17 +108,17 @@ func TestMoveTaskInColumn(t *testing.T) {
 			0,
 			2,
 			makeCol("Task A"),
-			board.ErrNilTask,
+			board.ErrIndexOutOfBounds,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := board.MoveTaskInColumn(&tt.column, tt.fromIndex, tt.toIndex)
+			err := board.MoveTaskInColumn(&tt.got, tt.fromIndex, tt.toIndex)
 			assertError(t, err, tt.err)
 
-			if !reflect.DeepEqual(tt.column.Tasks, tt.want.Tasks) {
-				t.Errorf("got %v, expected %v", tt.column.Tasks, tt.want.Tasks)
+			if !reflect.DeepEqual(tt.got.Tasks, tt.want.Tasks) {
+				t.Errorf("got %v, expected %v", tt.got.Tasks, tt.want.Tasks)
 			}
 		})
 	}
@@ -135,13 +130,6 @@ func makeCol(names ...string) markdown.Column {
 		tasks[i] = markdown.Task{Name: name}
 	}
 	return markdown.Column{Tasks: tasks}
-}
-
-func assertNoError(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func assertError(t testing.TB, got, want error) {

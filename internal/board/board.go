@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	ErrNilTask       = BoardErr("task cannot be nil")
-	ErrEmptyTaskName = BoardErr("task name cannot be empty")
+	ErrNilTask          = BoardErr("task cannot be nil")
+	ErrEmptyTaskName    = BoardErr("task name cannot be empty")
+	ErrIndexOutOfBounds = BoardErr("index out of bounds")
 )
 
 type BoardErr string
@@ -47,7 +48,7 @@ func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) error {
 	}
 
 	if fromIndex < 0 || toIndex < 0 || fromIndex > len(column.Tasks)-1 || toIndex > len(column.Tasks)-1 {
-		return ErrNilTask
+		return ErrIndexOutOfBounds
 	}
 
 	task := column.Tasks[fromIndex]
