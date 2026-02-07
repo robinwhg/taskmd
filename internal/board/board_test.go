@@ -49,6 +49,8 @@ func TestRenameTask(t *testing.T) {
 index out of bounds
 empty slice
 single task in slice
+refactor
+check move up and down
 */
 
 func TestMoveTaskInColumn(t *testing.T) {
@@ -63,7 +65,9 @@ func TestMoveTaskInColumn(t *testing.T) {
 			{Name: "Task A"},
 		}}
 
-		board.MoveTaskInColumn(&got, 0, 1)
+		err := board.MoveTaskInColumn(&got, 0, 1)
+
+		assertNoError(t, err)
 
 		if !reflect.DeepEqual(got.Tasks, got.Tasks) {
 			t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
@@ -81,12 +85,77 @@ func TestMoveTaskInColumn(t *testing.T) {
 			{Name: "Task B"},
 		}}
 
-		board.MoveTaskInColumn(&got, 0, 0)
+		err := board.MoveTaskInColumn(&got, 0, 0)
+
+		assertNoError(t, err)
 
 		if !reflect.DeepEqual(got.Tasks, want.Tasks) {
 			t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
 		}
 	})
+
+	t.Run("Move task with fromIndex out of bounds", func(t *testing.T) {
+		tests := []struct {
+			name      string
+			column    markdown.Column
+			fromIndex int
+			toIndex   int
+			want      markdown.Column
+			err       error
+		}{
+			{
+				"fromIndex out of lower bounds",
+				makeCol("Task A"),
+				-1,
+				0,
+				makeCol("Task A"),
+				board.ErrNilTask,
+			},
+			{
+				"toIndex out of lower bounds",
+				makeCol("Task A"),
+				0,
+				-1,
+				makeCol("Task A"),
+				board.ErrNilTask,
+			},
+			{
+				"fromIndex out of upper bounds",
+				makeCol("Task A"),
+				2,
+				0,
+				makeCol("Task A"),
+				board.ErrNilTask,
+			},
+			{
+				"toIndex out of upper bounds",
+				makeCol("Task A"),
+				0,
+				2,
+				makeCol("Task A"),
+				board.ErrNilTask,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				err := board.MoveTaskInColumn(&tt.column, tt.fromIndex, tt.toIndex)
+				assertError(t, err, tt.err)
+
+				if !reflect.DeepEqual(tt.column.Tasks, tt.want.Tasks) {
+					t.Errorf("got %v, expected %v", tt.column.Tasks, tt.want.Tasks)
+				}
+			})
+		}
+	})
+}
+
+func makeCol(names ...string) markdown.Column {
+	tasks := make([]markdown.Task, len(names))
+	for i, name := range names {
+		tasks[i] = markdown.Task{Name: name}
+	}
+	return markdown.Column{Tasks: tasks}
 }
 
 func assertNoError(t *testing.T, err error) {

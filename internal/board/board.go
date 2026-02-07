@@ -41,12 +41,18 @@ func RenameTask(task *markdown.Task, name string) error {
 	return nil
 }
 
-func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) {
+func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) error {
 	if fromIndex == toIndex {
-		return
+		return nil
+	}
+
+	if fromIndex < 0 || toIndex < 0 || fromIndex > len(column.Tasks)-1 || toIndex > len(column.Tasks)-1 {
+		return ErrNilTask
 	}
 
 	task := column.Tasks[fromIndex]
 	column.Tasks = slices.Delete(column.Tasks, fromIndex, fromIndex+1)
 	column.Tasks = slices.Insert(column.Tasks, toIndex, task)
+
+	return nil
 }
