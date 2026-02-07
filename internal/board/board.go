@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	ErrNilColumn        = BoardErr("column cannot be nil")
 	ErrNilTask          = BoardErr("task cannot be nil")
 	ErrEmptyTaskName    = BoardErr("task name cannot be empty")
 	ErrIndexOutOfBounds = BoardErr("index out of bounds")
@@ -38,6 +39,22 @@ func RenameTask(task *markdown.Task, name string) error {
 	}
 
 	task.Name = name
+
+	return nil
+}
+
+func InsertTask(column *markdown.Column, index int, task markdown.Task) error {
+	if column == nil {
+		return ErrNilColumn
+	}
+	if task.Name == "" {
+		return ErrEmptyTaskName
+	}
+	if index < 0 || index > len(column.Tasks) {
+		return ErrIndexOutOfBounds
+	}
+
+	column.Tasks = slices.Insert(column.Tasks, index, task)
 
 	return nil
 }

@@ -45,6 +45,54 @@ func TestRenameTask(t *testing.T) {
 	})
 }
 
+func TestInsertTask(t *testing.T) {
+	t.Run("Insert a task", func(t *testing.T) {
+		got := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+		}}
+		want := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+			{Name: "Task B"},
+		}}
+
+		err := board.InsertTask(&got, 1, markdown.Task{Name: "Task B"})
+		assertError(t, err, nil)
+
+		if !reflect.DeepEqual(got.Tasks, want.Tasks) {
+			t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
+		}
+	})
+
+	t.Run("Index out of lower bounds", func(t *testing.T) {
+		got := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+		}}
+		err := board.InsertTask(&got, -1, markdown.Task{Name: "Task B"})
+		assertError(t, err, board.ErrIndexOutOfBounds)
+	})
+
+	t.Run("Index out of upper bounds", func(t *testing.T) {
+		got := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+		}}
+		err := board.InsertTask(&got, 2, markdown.Task{Name: "Task B"})
+		assertError(t, err, board.ErrIndexOutOfBounds)
+	})
+
+	t.Run("Insert task with empty name", func(t *testing.T) {
+		got := markdown.Column{Tasks: []markdown.Task{
+			{Name: "Task A"},
+		}}
+		err := board.InsertTask(&got, 1, markdown.Task{})
+		assertError(t, err, board.ErrEmptyTaskName)
+	})
+
+	t.Run("Insert task to nil column", func(t *testing.T) {
+		err := board.InsertTask(nil, 0, markdown.Task{Name: "Task A"})
+		assertError(t, err, board.ErrNilColumn)
+	})
+}
+
 func TestMoveTaskInColumn(t *testing.T) {
 	tests := []struct {
 		name      string
