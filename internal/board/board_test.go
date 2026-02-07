@@ -48,7 +48,6 @@ func TestRenameTask(t *testing.T) {
 /* TODO: Test
 empty slice
 single task in slice
-check move up and down
 */
 
 func TestMoveTaskInColumn(t *testing.T) {
@@ -62,10 +61,18 @@ func TestMoveTaskInColumn(t *testing.T) {
 	}{
 		{
 			"Move task up in column",
-			makeCol("Task A", "Task B"),
-			0,
+			makeCol("Task A", "Task B", "Task C"),
 			1,
-			makeCol("Task B", "Task A"),
+			0,
+			makeCol("Task B", "Task A", "Task C"),
+			nil,
+		},
+		{
+			"Move task down in column",
+			makeCol("Task A", "Task B", "Task C"),
+			1,
+			2,
+			makeCol("Task A", "Task C", "Task B"),
 			nil,
 		},
 		{
