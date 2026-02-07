@@ -45,6 +45,7 @@ func TestRenameTask(t *testing.T) {
 	})
 }
 
+// TODO: Use table based tests
 func TestInsertTask(t *testing.T) {
 	t.Run("Insert a task", func(t *testing.T) {
 		got := markdown.Column{Tasks: []markdown.Task{
@@ -93,6 +94,7 @@ func TestInsertTask(t *testing.T) {
 	})
 }
 
+// FIXME: Add missing nil check for column
 func TestMoveTaskInColumn(t *testing.T) {
 	tests := []struct {
 		name      string
