@@ -59,6 +59,17 @@ func InsertTask(column *markdown.Column, index int, task markdown.Task) error {
 	return nil
 }
 
+func DeleteTask(column *markdown.Column, index int) error {
+	if column == nil {
+		return ErrNilColumn
+	}
+	if index < 0 || index > len(column.Tasks)-1 {
+		return ErrIndexOutOfBounds
+	}
+	column.Tasks = slices.Delete(column.Tasks, index, index+1)
+	return nil
+}
+
 func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) error {
 	if column == nil {
 		return ErrNilColumn

@@ -103,6 +103,54 @@ func TestInsertTask(t *testing.T) {
 	}
 }
 
+func TestDeleteTask(t *testing.T) {
+	t.Run("Delete task in nil column", func(t *testing.T) {
+		err := board.DeleteTask(nil, 0)
+		assertError(t, err, board.ErrNilColumn)
+	})
+
+	tests := []struct {
+		name  string
+		got   markdown.Column
+		index int
+		want  markdown.Column
+		err   error
+	}{
+		{
+			"Delete a Task",
+			makeCol("Task A"),
+			0,
+			makeCol(),
+			nil,
+		},
+		{
+			"Index out of lower bounds",
+			makeCol("Task A"),
+			-1,
+			makeCol("Task A"),
+			board.ErrIndexOutOfBounds,
+		},
+		{
+			"Index out of upper bounds",
+			makeCol("Task A"),
+			1,
+			makeCol("Task A"),
+			board.ErrIndexOutOfBounds,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := board.DeleteTask(&tt.got, tt.index)
+			assertError(t, err, tt.err)
+
+			if !reflect.DeepEqual(tt.got, tt.want) {
+				t.Errorf("got %v, expected %v", tt.got, tt.want)
+			}
+		})
+	}
+}
+
 func TestMoveTaskInColumn(t *testing.T) {
 	t.Run("Move task in a nil column", func(t *testing.T) {
 		err := board.MoveTaskInColumn(nil, 0, 1)
