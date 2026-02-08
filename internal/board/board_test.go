@@ -103,8 +103,12 @@ func TestInsertTask(t *testing.T) {
 	}
 }
 
-// FIXME: Add missing nil check for column
 func TestMoveTaskInColumn(t *testing.T) {
+	t.Run("Move task in a nil column", func(t *testing.T) {
+		err := board.MoveTaskInColumn(nil, 0, 1)
+		assertError(t, err, board.ErrNilColumn)
+	})
+
 	tests := []struct {
 		name      string
 		got       markdown.Column

@@ -60,6 +60,9 @@ func InsertTask(column *markdown.Column, index int, task markdown.Task) error {
 }
 
 func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) error {
+	if column == nil {
+		return ErrNilColumn
+	}
 	if fromIndex == toIndex {
 		return nil
 	}
