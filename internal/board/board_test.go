@@ -235,6 +235,78 @@ func TestMoveTaskInColumn(t *testing.T) {
 	}
 }
 
+func TestMoveTaskToColumn(t *testing.T) {
+	t.Run("Move task from nil column", func(t *testing.T) {
+		err := board.MoveTaskToColumn(nil, 0, &markdown.Column{}, 0)
+		assertError(t, err, board.ErrNilColumn)
+	})
+	t.Run("Move task to nil column", func(t *testing.T) {
+		err := board.MoveTaskToColumn(&markdown.Column{}, 0, nil, 0)
+		assertError(t, err, board.ErrNilColumn)
+	})
+
+	tests := []struct {
+		name      string
+		got       [2]markdown.Column
+		fromIndex int
+		toIndex   int
+		want      [2]markdown.Column
+		err       error
+	}{
+		{
+			"Move task to column",
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			0,
+			0,
+			[2]markdown.Column{makeCol(), makeCol("Task A")},
+			nil,
+		},
+		{
+			"fromIndex out of lower bounds",
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			-1,
+			0,
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			board.ErrIndexOutOfBounds,
+		},
+		{
+			"fromIndex out of upper bounds",
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			2,
+			0,
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			board.ErrIndexOutOfBounds,
+		},
+		{
+			"toIndex out of lower bounds",
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			0,
+			-1,
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			board.ErrIndexOutOfBounds,
+		},
+		{
+			"toIndex out of upper bounds",
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			0,
+			2,
+			[2]markdown.Column{makeCol("Task A"), makeCol()},
+			board.ErrIndexOutOfBounds,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := board.MoveTaskToColumn(&tt.got[0], tt.fromIndex, &tt.got[1], tt.toIndex)
+			assertError(t, err, tt.err)
+
+			if !reflect.DeepEqual(tt.got, tt.want) {
+				t.Errorf("got %v, expected %v", tt.got, tt.want)
+			}
+		})
+	}
+}
+
 func makeCol(names ...string) markdown.Column {
 	tasks := make([]markdown.Task, len(names))
 	for i, name := range names {

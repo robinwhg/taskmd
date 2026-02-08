@@ -88,6 +88,24 @@ func MoveTaskInColumn(column *markdown.Column, fromIndex, toIndex int) error {
 	return nil
 }
 
+func MoveTaskToColumn(fromColumn *markdown.Column, fromIndex int, toColumn *markdown.Column, toIndex int) error {
+	if fromColumn == nil || toColumn == nil {
+		return ErrNilColumn
+	}
+	if err := checkIndexOutOfBounds(fromColumn, fromIndex); err != nil {
+		return err
+	}
+	if toIndex < 0 || toIndex > len(toColumn.Tasks) {
+		return ErrIndexOutOfBounds
+	}
+
+	task := fromColumn.Tasks[fromIndex]
+	fromColumn.Tasks = slices.Delete(fromColumn.Tasks, fromIndex, fromIndex+1)
+	toColumn.Tasks = slices.Insert(toColumn.Tasks, toIndex, task)
+
+	return nil
+}
+
 func checkIndexOutOfBounds(column *markdown.Column, index ...int) error {
 	for _, i := range index {
 		if i < 0 || i > len(column.Tasks)-1 {
