@@ -45,53 +45,62 @@ func TestRenameTask(t *testing.T) {
 	})
 }
 
-// TODO: Use table based tests
 func TestInsertTask(t *testing.T) {
-	t.Run("Insert a task", func(t *testing.T) {
-		got := markdown.Column{Tasks: []markdown.Task{
-			{Name: "Task A"},
-		}}
-		want := markdown.Column{Tasks: []markdown.Task{
-			{Name: "Task A"},
-			{Name: "Task B"},
-		}}
-
-		err := board.InsertTask(&got, 1, markdown.Task{Name: "Task B"})
-		assertError(t, err, nil)
-
-		if !reflect.DeepEqual(got.Tasks, want.Tasks) {
-			t.Errorf("got %v, expected %v", got.Tasks, want.Tasks)
-		}
-	})
-
-	t.Run("Index out of lower bounds", func(t *testing.T) {
-		got := markdown.Column{Tasks: []markdown.Task{
-			{Name: "Task A"},
-		}}
-		err := board.InsertTask(&got, -1, markdown.Task{Name: "Task B"})
-		assertError(t, err, board.ErrIndexOutOfBounds)
-	})
-
-	t.Run("Index out of upper bounds", func(t *testing.T) {
-		got := markdown.Column{Tasks: []markdown.Task{
-			{Name: "Task A"},
-		}}
-		err := board.InsertTask(&got, 2, markdown.Task{Name: "Task B"})
-		assertError(t, err, board.ErrIndexOutOfBounds)
-	})
-
-	t.Run("Insert task with empty name", func(t *testing.T) {
-		got := markdown.Column{Tasks: []markdown.Task{
-			{Name: "Task A"},
-		}}
-		err := board.InsertTask(&got, 1, markdown.Task{})
-		assertError(t, err, board.ErrEmptyTaskName)
-	})
-
 	t.Run("Insert task to nil column", func(t *testing.T) {
 		err := board.InsertTask(nil, 0, markdown.Task{Name: "Task A"})
 		assertError(t, err, board.ErrNilColumn)
 	})
+
+	tests := []struct {
+		name  string
+		got   markdown.Column
+		index int
+		task  markdown.Task
+		want  markdown.Column
+		err   error
+	}{
+		{
+			"Insert a task",
+			makeCol("Task A"),
+			1,
+			markdown.Task{Name: "Task B"},
+			makeCol("Task A", "Task B"),
+			nil,
+		},
+		{
+			"Index out of lower bounds",
+			makeCol("Task A"),
+			-1,
+			markdown.Task{Name: "Task B"},
+			makeCol("Task A"),
+			board.ErrIndexOutOfBounds,
+		},
+		{
+			"Index out of upper bounds",
+			makeCol("Task A"),
+			2,
+			markdown.Task{Name: "Task B"},
+			makeCol("Task A"),
+			board.ErrIndexOutOfBounds,
+		},
+		{
+			"Insert task with empty name",
+			makeCol("Task A"),
+			1,
+			markdown.Task{Name: ""},
+			makeCol("Task A"),
+			board.ErrEmptyTaskName,
+		},
+	}
+
+	for _, tt := range tests {
+		err := board.InsertTask(&tt.got, tt.index, tt.task)
+		assertError(t, err, tt.err)
+
+		if !reflect.DeepEqual(tt.got.Tasks, tt.want.Tasks) {
+			t.Errorf("got %v, expected %v", tt.got.Tasks, tt.want.Tasks)
+		}
+	}
 }
 
 // FIXME: Add missing nil check for column
