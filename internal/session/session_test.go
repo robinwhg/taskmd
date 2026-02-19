@@ -5,16 +5,20 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/robinwhg/taskmd/internal/markdown"
 	"github.com/robinwhg/taskmd/internal/session"
 )
 
 func TestNewSession(t *testing.T) {
 	fs := fstest.MapFS{
-		"tasks.md": {Data: []byte("foo\nbar")},
+		"tasks.md": {Data: []byte("foo\n## To Do")},
 	}
 
 	got, err := session.NewSessionFromFS(fs, "tasks.md")
-	want := session.Session{Lines: []string{"foo", "bar"}}
+	want := session.Session{
+		Lines: []string{"foo", "## To Do"},
+		Board: markdown.Board{Columns: []markdown.Column{{Name: "To Do", Line: 1}}},
+	}
 
 	assertError(t, err, nil)
 

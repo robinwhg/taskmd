@@ -35,6 +35,12 @@ func newSession(sessionFile io.Reader) (*Session, error) {
 	}
 
 	lines := strings.Split(string(sessionData), "\n")
-	session := Session{Lines: lines}
+
+	board, err := markdown.Parse(strings.NewReader(string(sessionData)))
+	if err != nil {
+		return nil, err
+	}
+
+	session := Session{Lines: lines, Board: *board}
 	return &session, nil
 }
