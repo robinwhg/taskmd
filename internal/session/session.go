@@ -10,8 +10,9 @@ import (
 )
 
 type Session struct {
-	Lines []string
-	Board markdown.Board
+	FileName string
+	Lines    []string
+	Board    markdown.Board
 }
 
 func NewSessionFromFS(fileSystem fs.FS, fileName string) (session *Session, err error) {
@@ -25,10 +26,10 @@ func NewSessionFromFS(fileSystem fs.FS, fileName string) (session *Session, err 
 		}
 	}()
 
-	return newSession(file)
+	return newSession(file, fileName)
 }
 
-func newSession(sessionFile io.Reader) (*Session, error) {
+func newSession(sessionFile io.Reader, fileName string) (*Session, error) {
 	sessionData, err := io.ReadAll(sessionFile)
 	if err != nil {
 		return nil, err
@@ -41,6 +42,6 @@ func newSession(sessionFile io.Reader) (*Session, error) {
 		return nil, err
 	}
 
-	session := Session{Lines: lines, Board: *board}
+	session := Session{FileName: fileName, Lines: lines, Board: *board}
 	return &session, nil
 }
