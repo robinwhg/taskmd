@@ -1,7 +1,7 @@
 package session_test
 
 import (
-	"io"
+	"bytes"
 	"reflect"
 	"testing"
 	"testing/fstest"
@@ -29,33 +29,17 @@ func TestNewSession(t *testing.T) {
 	}
 }
 
-func TestWriteLines(t *testing.T) {
-	fs := fstest.MapFS{
-		"tasks.md": {Data: []byte("foo")},
-	}
-
-	changes := map[int]session.LineChange{
-		0: {Content: "bar"},
-	}
-
-	session.WriteLines(fs, "tasks.md", changes)
-
-	file, err := fs.Open("tasks.md")
+func TestWrite(t *testing.T) {
+	input := session.Session{Lines: []string{"foo"}}
+	input.Lines[0] = "bar"
+	buffer := bytes.Buffer{}
+	err := input.Write(&buffer)
 	assertError(t, err, nil)
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil && err == nil {
-			err = closeErr
-		}
-	}()
-
-	fileData, err := io.ReadAll(file)
-	assertError(t, err, nil)
-
-	got := string(fileData)
+	got := buffer.String()
 	want := "bar"
 
 	if got != want {
-		t.Errorf("got %v, expected %v", got, want)
+		t.Errorf("got %q, expected %q", got, want)
 	}
 }
 

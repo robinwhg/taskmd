@@ -15,6 +15,20 @@ type Session struct {
 	Board    markdown.Board
 }
 
+func (s *Session) Write(writer io.Writer) error {
+	content := strings.Join(s.Lines, "\n")
+
+	_, err := writer.Write([]byte(content))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Why even pass anything if I have the filename?
+// NOTE: WriteLines should be private, but need to test it somehow
+
 func NewSessionFromFS(fileSystem fs.FS, fileName string) (session *Session, err error) {
 	file, err := fileSystem.Open(fileName)
 	if err != nil {
