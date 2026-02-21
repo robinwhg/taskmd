@@ -10,9 +10,8 @@ import (
 )
 
 type Session struct {
-	FileName string
-	Lines    []string
-	Board    markdown.Board
+	Lines []string
+	Board markdown.Board
 }
 
 func (s *Session) Write(writer io.Writer) error {
@@ -56,6 +55,6 @@ func newSession(sessionFile io.Reader, fileName string) (*Session, error) {
 		return nil, err
 	}
 
-	session := Session{FileName: fileName, Lines: lines, Board: *board}
+	session := Session{Lines: lines, Board: *board}
 	return &session, nil
 }

@@ -17,9 +17,8 @@ func TestNewSession(t *testing.T) {
 
 	got, err := session.NewSessionFromFS(fs, "tasks.md")
 	want := session.Session{
-		FileName: "tasks.md",
-		Lines:    []string{"foo", "## To Do"},
-		Board:    markdown.Board{Columns: []markdown.Column{{Name: "To Do", Line: 1}}},
+		Lines: []string{"foo", "## To Do"},
+		Board: markdown.Board{Columns: []markdown.Column{{Name: "To Do", Line: 1}}},
 	}
 
 	assertError(t, err, nil)
