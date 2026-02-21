@@ -10,7 +10,7 @@ Manage tasks with Markdown from your terminal.
 2. Operations & Logic
    1. Task mutations (toggle, rename, insert, delete, move)
    2. Line number tracking
-   3. File persistence
+   3. Line mutations and task mutation calling
 3. Interface
    1. Read-Only TUI
    2. Interactive TUI
