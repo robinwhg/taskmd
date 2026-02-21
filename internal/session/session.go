@@ -24,15 +24,15 @@ func (s *Session) Write(writer io.Writer) error {
 	return nil
 }
 
-func NewSession(sessionFile io.Reader) (*Session, error) {
-	sessionData, err := io.ReadAll(sessionFile)
+func NewSession(reader io.Reader) (*Session, error) {
+	readerData, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
 
-	lines := strings.Split(string(sessionData), "\n")
+	lines := strings.Split(string(readerData), "\n")
 
-	board, err := markdown.Parse(strings.NewReader(string(sessionData)))
+	board, err := markdown.Parse(strings.NewReader(string(readerData)))
 	if err != nil {
 		return nil, err
 	}
