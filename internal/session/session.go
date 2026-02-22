@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/robinwhg/taskmd/internal/board"
 	"github.com/robinwhg/taskmd/internal/markdown"
 )
 
@@ -17,6 +18,24 @@ func (s *Session) Write(writer io.Writer) error {
 	content := strings.Join(s.Lines, "\n")
 
 	_, err := writer.Write([]byte(content))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Session) ToggleTask(columnIndex, taskIndex int, writer io.Writer) error {
+	task := &s.Board.Columns[columnIndex].Tasks[taskIndex]
+
+	err := board.ToggleTask(task)
+	if err != nil {
+		return err
+	}
+
+	s.Lines[task.Line] = markdown.RenderTask(*task)
+
+	err = s.Write(writer)
 	if err != nil {
 		return err
 	}

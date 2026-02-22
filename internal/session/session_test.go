@@ -39,6 +39,23 @@ func TestWriteSession(t *testing.T) {
 	}
 }
 
+func TestToggleTask(t *testing.T) {
+	input := "- [ ] Task A"
+	output := bytes.Buffer{}
+
+	s, _ := session.NewSession(strings.NewReader(input))
+
+	err := s.ToggleTask(0, 0, &output)
+	assertError(t, err, nil)
+
+	got := output.String()
+	want := "- [x] Task A"
+
+	if got != want {
+		t.Errorf("got %v, expected %v", output, want)
+	}
+}
+
 func assertError(t testing.TB, got, want error) {
 	t.Helper()
 
