@@ -12,9 +12,12 @@ import (
 type Session struct {
 	Lines []string
 	Board markdown.Board
+	// TODO: Save writer here
 }
 
 func (s *Session) Write(writer io.Writer) error {
+	// TODO: Make private
+	// TODO: Check nil value
 	content := strings.Join(s.Lines, "\n")
 
 	_, err := writer.Write([]byte(content))
@@ -26,6 +29,7 @@ func (s *Session) Write(writer io.Writer) error {
 }
 
 func (s *Session) ToggleTask(columnIndex, taskIndex int, writer io.Writer) error {
+	// TODO: Check bounds
 	task := &s.Board.Columns[columnIndex].Tasks[taskIndex]
 
 	err := board.ToggleTask(task)
