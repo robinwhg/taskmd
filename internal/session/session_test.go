@@ -30,10 +30,6 @@ func TestNewSession(t *testing.T) {
 		if !reflect.DeepEqual(got.Board, wantBoard) {
 			t.Errorf("got %v, expected %v", got.Board, wantBoard)
 		}
-
-		if got.Writer == nil {
-			t.Errorf("expected non-nil writer")
-		}
 	})
 
 	t.Run("Test nil writer", func(t *testing.T) {
@@ -52,23 +48,74 @@ func (s stubFailingWriter) Write(p []byte) (n int, err error) {
 }
 
 func TestToggleTask(t *testing.T) {
-	t.Run("Toggle a task", func(t *testing.T) {
-		input := "- [ ] Task A"
-		output := bytes.Buffer{}
+	tests := []struct {
+		name        string
+		columnIndex int
+		taskIndex   int
+		input       string
+		want        string
+		err         error
+	}{
+		{
+			"Toggle an unchecked task",
+			0,
+			0,
+			"- [ ] Task A",
+			"- [x] Task A",
+			nil,
+		}, {
+			"Toggle a checked task",
+			0,
+			0,
+			"- [x] Task A",
+			"- [ ] Task A",
+			nil,
+		}, {
+			"Column index out of lower bounds",
+			-1,
+			0,
+			"- [x] Task A",
+			"",
+			session.ErrIndexOutOfBounds,
+		}, {
+			"Column index out of upper bounds",
+			1,
+			0,
+			"- [x] Task A",
+			"",
+			session.ErrIndexOutOfBounds,
+		}, {
+			"Task index out of lower bounds",
+			0,
+			-1,
+			"- [x] Task A",
+			"",
+			session.ErrIndexOutOfBounds,
+		}, {
+			"Task index out of upper bounds",
+			0,
+			1,
+			"- [x] Task A",
+			"",
+			session.ErrIndexOutOfBounds,
+		},
+	}
 
-		s, err := session.NewSession(strings.NewReader(input), &output)
-		assertError(t, err, nil)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			writer := bytes.Buffer{}
+			s, err := session.NewSession(strings.NewReader(tt.input), &writer)
+			assertError(t, err, nil)
 
-		err = s.ToggleTask(0, 0)
-		assertError(t, err, nil)
+			err = s.ToggleTask(tt.columnIndex, tt.taskIndex)
+			assertError(t, err, tt.err)
 
-		got := output.String()
-		want := "- [x] Task A"
-
-		if got != want {
-			t.Errorf("got %v, expected %v", output, want)
-		}
-	})
+			got := writer.String()
+			if got != tt.want {
+				t.Errorf("got %v, expected %v", got, tt.want)
+			}
+		})
+	}
 
 	t.Run("Failing Write", func(t *testing.T) {
 		input := "- [ ] Task A"

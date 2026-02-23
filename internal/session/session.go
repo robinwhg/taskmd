@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	ErrNilWriter = SessionError("writer cannot be nil")
+	ErrNilWriter        = SessionError("writer cannot be nil")
+	ErrIndexOutOfBounds = SessionError("index out of bounds")
 )
 
 type SessionError string
@@ -22,17 +23,17 @@ func (e SessionError) Error() string {
 type Session struct {
 	Lines  []string
 	Board  markdown.Board
-	Writer io.Writer
+	writer io.Writer
 }
 
 func (s *Session) write() error {
-	if s.Writer == nil {
+	if s.writer == nil {
 		return ErrNilWriter
 	}
 
 	content := strings.Join(s.Lines, "\n")
 
-	_, err := s.Writer.Write([]byte(content))
+	_, err := s.writer.Write([]byte(content))
 	if err != nil {
 		return err
 	}
@@ -40,23 +41,39 @@ func (s *Session) write() error {
 	return nil
 }
 
-func (s *Session) ToggleTask(columnIndex, taskIndex int) error {
-	// TODO: Check bounds
-	task := &s.Board.Columns[columnIndex].Tasks[taskIndex]
+func (s *Session) getColumn(columnIndex int) (*markdown.Column, error) {
+	if columnIndex < 0 || columnIndex >= len(s.Board.Columns) {
+		return nil, ErrIndexOutOfBounds
+	}
 
-	err := board.ToggleTask(task)
+	return &s.Board.Columns[columnIndex], nil
+}
+
+func (s *Session) getTask(columnIndex, taskIndex int) (*markdown.Task, error) {
+	column, err := s.getColumn(columnIndex)
 	if err != nil {
+		return nil, err
+	}
+
+	if taskIndex < 0 || taskIndex >= len(column.Tasks) {
+		return nil, ErrIndexOutOfBounds
+	}
+
+	return &column.Tasks[taskIndex], nil
+}
+
+func (s *Session) ToggleTask(columnIndex, taskIndex int) error {
+	task, err := s.getTask(columnIndex, taskIndex)
+	if err != nil {
+		return err
+	}
+
+	if err := board.ToggleTask(task); err != nil {
 		return err
 	}
 
 	s.Lines[task.Line] = markdown.RenderTask(*task)
-
-	err = s.write()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.write()
 }
 
 func NewSession(reader io.Reader, writer io.Writer) (*Session, error) {
@@ -76,6 +93,6 @@ func NewSession(reader io.Reader, writer io.Writer) (*Session, error) {
 		return nil, err
 	}
 
-	session := Session{Lines: lines, Board: *board, Writer: writer}
+	session := Session{Lines: lines, Board: *board, writer: writer}
 	return &session, nil
 }
