@@ -108,7 +108,7 @@ func MoveTaskToColumn(fromColumn *markdown.Column, fromIndex int, toColumn *mark
 
 func checkIndexOutOfBounds(column *markdown.Column, index ...int) error {
 	for _, i := range index {
-		if i < 0 || i > len(column.Tasks)-1 {
+		if i < 0 || i >= len(column.Tasks) {
 			return ErrIndexOutOfBounds
 		}
 	}
