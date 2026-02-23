@@ -2,6 +2,7 @@ package session_test
 
 import (
 	"bytes"
+	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -12,12 +13,14 @@ import (
 
 func TestNewSession(t *testing.T) {
 	input := "foo\n## To Do"
-	got, err := session.NewSession(strings.NewReader(input))
+	output := bytes.Buffer{}
+	got, err := session.NewSession(strings.NewReader(input), &output)
 	assertError(t, err, nil)
 
 	want := session.Session{
-		Lines: []string{"foo", "## To Do"},
-		Board: markdown.Board{Columns: []markdown.Column{{Name: "To Do", Line: 1}}},
+		Lines:  []string{"foo", "## To Do"},
+		Board:  markdown.Board{Columns: []markdown.Column{{Name: "To Do", Line: 1}}},
+		Writer: &bytes.Buffer{},
 	}
 
 	if !reflect.DeepEqual(got, &want) {
@@ -25,35 +28,41 @@ func TestNewSession(t *testing.T) {
 	}
 }
 
-func TestWriteSession(t *testing.T) {
-	input := session.Session{Lines: []string{"foo"}}
-	input.Lines[0] = "bar"
-	buffer := bytes.Buffer{}
-	err := input.Write(&buffer)
-	assertError(t, err, nil)
-	got := buffer.String()
-	want := "bar"
+var errWrite = errors.New("write failed")
 
-	if got != want {
-		t.Errorf("got %q, expected %q", got, want)
-	}
+type stubFailingWriter struct{}
+
+func (s stubFailingWriter) Write(p []byte) (n int, err error) {
+	return 0, errWrite
 }
 
 func TestToggleTask(t *testing.T) {
-	input := "- [ ] Task A"
-	output := bytes.Buffer{}
+	t.Run("Toggle a task", func(t *testing.T) {
+		input := "- [ ] Task A"
+		output := bytes.Buffer{}
 
-	s, _ := session.NewSession(strings.NewReader(input))
+		s, _ := session.NewSession(strings.NewReader(input), &output)
 
-	err := s.ToggleTask(0, 0, &output)
-	assertError(t, err, nil)
+		err := s.ToggleTask(0, 0)
+		assertError(t, err, nil)
 
-	got := output.String()
-	want := "- [x] Task A"
+		got := output.String()
+		want := "- [x] Task A"
 
-	if got != want {
-		t.Errorf("got %v, expected %v", output, want)
-	}
+		if got != want {
+			t.Errorf("got %v, expected %v", output, want)
+		}
+	})
+
+	t.Run("Failing Write", func(t *testing.T) {
+		input := "- [ ] Task A"
+		output := stubFailingWriter{}
+
+		s, _ := session.NewSession(strings.NewReader(input), &output)
+
+		err = s.ToggleTask(0, 0)
+		assertError(t, err, errWrite)
+	})
 }
 
 func assertError(t testing.TB, got, want error) {

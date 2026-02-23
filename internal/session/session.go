@@ -9,8 +9,9 @@ import (
 	"github.com/robinwhg/taskmd/internal/markdown"
 )
 
-const ErrNilWriter = SessionError("write cannot be nil")
+const (
 	ErrNilWriter = SessionError("writer cannot be nil")
+)
 
 type SessionError string
 
@@ -19,19 +20,15 @@ func (e SessionError) Error() string {
 }
 
 type Session struct {
-	Lines []string
-	Board markdown.Board
-	// TODO: Save writer here
+	Lines  []string
+	Board  markdown.Board
+	Writer io.Writer
 }
 
-func (s *Session) write(writer io.Writer) error {
-	if writer == nil {
-		return ErrNilWriter
-	}
-
+func (s *Session) write() error {
 	content := strings.Join(s.Lines, "\n")
 
-	_, err := writer.Write([]byte(content))
+	_, err := s.Writer.Write([]byte(content))
 	if err != nil {
 		return err
 	}
@@ -39,7 +36,7 @@ func (s *Session) write(writer io.Writer) error {
 	return nil
 }
 
-func (s *Session) ToggleTask(columnIndex, taskIndex int, writer io.Writer) error {
+func (s *Session) ToggleTask(columnIndex, taskIndex int) error {
 	// TODO: Check bounds
 	task := &s.Board.Columns[columnIndex].Tasks[taskIndex]
 
@@ -50,7 +47,7 @@ func (s *Session) ToggleTask(columnIndex, taskIndex int, writer io.Writer) error
 
 	s.Lines[task.Line] = markdown.RenderTask(*task)
 
-	err = s.write(writer)
+	err = s.write()
 	if err != nil {
 		return err
 	}
@@ -58,10 +55,14 @@ func (s *Session) ToggleTask(columnIndex, taskIndex int, writer io.Writer) error
 	return nil
 }
 
-func NewSession(reader io.Reader) (*Session, error) {
+func NewSession(reader io.Reader, writer io.Writer) (*Session, error) {
 	readerData, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
+	}
+
+	if writer == nil {
+		return nil, ErrNilWriter
 	}
 
 	lines := strings.Split(string(readerData), "\n")
@@ -71,6 +72,6 @@ func NewSession(reader io.Reader) (*Session, error) {
 		return nil, err
 	}
 
-	session := Session{Lines: lines, Board: *board}
+	session := Session{Lines: lines, Board: *board, Writer: writer}
 	return &session, nil
 }
