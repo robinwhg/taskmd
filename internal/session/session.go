@@ -26,6 +26,10 @@ type Session struct {
 }
 
 func (s *Session) write() error {
+	if s.Writer == nil {
+		return ErrNilWriter
+	}
+
 	content := strings.Join(s.Lines, "\n")
 
 	_, err := s.Writer.Write([]byte(content))
