@@ -9,15 +9,26 @@ import (
 	"github.com/robinwhg/taskmd/internal/markdown"
 )
 
+const ErrNilWriter = SessionError("write cannot be nil")
+	ErrNilWriter = SessionError("writer cannot be nil")
+
+type SessionError string
+
+func (e SessionError) Error() string {
+	return string(e)
+}
+
 type Session struct {
 	Lines []string
 	Board markdown.Board
 	// TODO: Save writer here
 }
 
-func (s *Session) Write(writer io.Writer) error {
-	// TODO: Make private
-	// TODO: Check nil value
+func (s *Session) write(writer io.Writer) error {
+	if writer == nil {
+		return ErrNilWriter
+	}
+
 	content := strings.Join(s.Lines, "\n")
 
 	_, err := writer.Write([]byte(content))
@@ -39,7 +50,7 @@ func (s *Session) ToggleTask(columnIndex, taskIndex int, writer io.Writer) error
 
 	s.Lines[task.Line] = markdown.RenderTask(*task)
 
-	err = s.Write(writer)
+	err = s.write(writer)
 	if err != nil {
 		return err
 	}
