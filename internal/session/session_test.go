@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/robinwhg/taskmd/internal/board"
 	"github.com/robinwhg/taskmd/internal/markdown"
 	"github.com/robinwhg/taskmd/internal/session"
 )
@@ -126,6 +127,32 @@ func TestToggleTask(t *testing.T) {
 
 		err = s.ToggleTask(0, 0)
 		assertError(t, err, errWrite)
+	})
+}
+
+func TestRenameTask(t *testing.T) {
+	t.Run("Rename a task", func(t *testing.T) {
+		writer := bytes.Buffer{}
+		s, err := session.NewSession(strings.NewReader("- [ ] Task A"), &writer)
+		assertError(t, err, nil)
+
+		err = s.RenameTask(0, 0, "Task B")
+		assertError(t, err, nil)
+
+		got := writer.String()
+		want := "- [ ] Task B"
+		if got != want {
+			t.Errorf("got %v, expected %v", got, want)
+		}
+	})
+
+	t.Run("Rename a task to an empty string", func(t *testing.T) {
+		writer := bytes.Buffer{}
+		s, err := session.NewSession(strings.NewReader("- [ ] Task A"), &writer)
+		assertError(t, err, nil)
+
+		err = s.RenameTask(0, 0, "")
+		assertError(t, err, board.ErrEmptyTaskName)
 	})
 }
 
